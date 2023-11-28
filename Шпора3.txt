@@ -1,0 +1,259 @@
+ОКНО ДОБАВЛЕНИЯ 
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace DEMOOOOOOO
+{
+    public partial class AddApp : Form
+    {
+        BD bd = new BD();
+        public AddApp()
+        {
+            InitializeComponent();
+        }
+
+        private void add_btn_Click(object sender, EventArgs e)
+        {
+            var problemApp = problem_tb.Text;
+            var typeApp = type_tb.Text;
+            var descriptionApp = description_tb.Text;
+            var fioApp = FIO_tb.Text;
+            var statusApp = status_tb.Text;
+            var sotrudnikApp = sotrudnik_tb.Text;
+            string query = $"INSERT INTO Заявка values('{problemApp}','{typeApp}', '{descriptionApp}', '{DateTime.Now}','{fioApp}', '{sotrudnikApp}', '{statusApp}')";
+            SqlCommand sqlCommand = new SqlCommand(query, bd.getcon());
+            SqlDataAdapter adapter = new SqlDataAdapter(sqlCommand);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+        }
+
+        private void AddApp_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+
+
+ОКНО ЗАЯВОК
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace DEMOOOOOOO
+{
+    public partial class applications : Form
+    {
+        BD bd = new BD();
+        public applications()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            AddApp addApp = new AddApp();
+            addApp.Show();
+        }
+
+        private void applications_Load(object sender, EventArgs e)
+        {
+
+            string query = $"select * from Заявка";
+            SqlCommand sqlCommand = new SqlCommand(query, bd.getcon());
+            SqlDataAdapter adapter = new SqlDataAdapter(sqlCommand);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+            dgv.DataSource = dt;
+            dgv.Columns[0].ReadOnly = true;
+
+        }
+
+        private void dgv_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Correct correct = new Correct();
+            this.Hide();
+            correct.Show();
+        }
+
+        private void applications_Load_1(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+
+
+ОКНО РЕДАКТИРОВАНИЯ
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace DEMOOOOOOO
+{
+    public partial class Correct : Form
+    {
+        BD bd = new BD();
+        public Correct()
+        {
+            InitializeComponent();
+        }
+
+        private void crrct_btn_Click(object sender, EventArgs e)
+        {
+            var idApp = id_tb.Text;
+            var problemApp = problem_tb.Text;
+            var typeApp = type_tb.Text;
+            var descriptionApp = description_tb.Text;
+            var fioApp = FIO_tb.Text;
+            var statusApp = status_tb.Text;
+            var sotrudnikApp = sotrudnik_tb.Text;
+            string query = $"UPDATE Заявка SET [неисправность_оборудования] ='{problemApp}', [тип_неисправности]='{typeApp}', [описание] = '{descriptionApp}', [дата_добавления] = '{DateTime.Now}', [ФИО_клиента] = '{fioApp}', [id_сотрудника] = '{sotrudnikApp}', [статус_заявки] = '{statusApp}' where [id] = '{idApp}'";
+            SqlCommand sqlCommand = new SqlCommand(query, bd.getcon());
+            SqlDataAdapter adapter = new SqlDataAdapter(sqlCommand);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+            MessageBox.Show("1231");
+            applications applications = new applications();
+            this.Hide();
+            applications.Show();
+        }
+
+        private void Correct_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+
+
+ОКНО АВТОРИЗАЦИИ
+
+using System.Data;
+using System.Data.SqlClient;
+
+namespace DEMOOOOOOO
+{
+    public partial class Form1 : Form
+    {
+        BD bd = new BD();
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void input_btn_Click(object sender, EventArgs e)
+        {
+            var loginUser = login_tb.Text;
+            var passwordUser = password_tb.Text;
+            string query = $"select имя, пароль, должность from Сторудники where имя='{loginUser}' and пароль = '{passwordUser}'";
+            SqlCommand sqlCommand = new SqlCommand(query, bd.getcon());
+            SqlDataAdapter adapter = new SqlDataAdapter(sqlCommand);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+
+
+            if (dt.Rows.Count == 1)
+            {
+                var role = dt.Rows[0][2].ToString();
+                MessageBox.Show("Успех");
+                applications applications = new applications();
+                this.Hide();
+                applications.Show();
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            password_tb.PasswordChar = '*';
+        }
+
+        private void Form1_Load_1(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
+
+
+
+ПОДКЛЮЧЕНИЕ БД
+
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DEMOOOOOOO
+{
+    internal class BD
+    {
+        SqlConnection con = new SqlConnection(@"Data source = TIPSIK; Initial catalog = spermaglotik3000; Integrated security = True");
+
+        public void opencon()
+        {
+            if(con.State == System.Data.ConnectionState.Closed)
+            {
+                con.Open();
+            }
+        }
+
+        public void closecon()
+        {
+            if (con.State == System.Data.ConnectionState.Open)
+            {
+                con.Close();
+            }
+        }
+
+        public SqlConnection getcon()
+        {
+            return con;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
